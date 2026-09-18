@@ -1,0 +1,478 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { categories, products } from '../data/products';
+import { site } from '../data/site';
+
+const featuredProducts = products.filter((product) => product.featured);
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: site.title,
+  description: site.description,
+  url: site.canonicalUrl,
+  inLanguage: 'es-PR',
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: products.length,
+    itemListElement: products.map((product, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: `${product.brand} ${product.name}${product.size ? ` — ${product.size}` : ''}`,
+    })),
+  },
+};
+---
+
+<BaseLayout>
+  <script type="application/ld+json" set:html={JSON.stringify(itemListSchema)} />
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="/" aria-label="Muscle Mania PR — Inicio">
+        <img src="/assets/logo-muscle-mania.webp" width="720" height="671" alt="Muscle Mania PR — The Three Kings" />
+      </a>
+
+      <nav aria-label="Navegación principal">
+        <a href="#destacados">Recomendados</a>
+        <a href="#catalogo">Productos</a>
+        <a href="#como-ordenar">Cómo ordenar</a>
+      </nav>
+
+      <button class="selection-trigger selection-trigger--header" type="button" data-open-selection>
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M6 7h15l-1.5 9h-12zM6 7 5 3H2M9 20h.01M18 20h.01"></path>
+        </svg>
+        <span>Mi lista</span>
+        <strong data-selection-count>0</strong>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero__grid">
+        <div class="hero__content">
+          <p class="eyebrow">Detailing shop · Puerto Rico</p>
+          <h1>EL BRILLO<br /><span>SE ESCOGE AQUÍ.</span></h1>
+          <p class="hero__copy">
+            Selecciona tus productos, ajusta las cantidades y envíanos la lista por WhatsApp. Nosotros confirmamos disponibilidad contigo.
+          </p>
+          <div class="hero__actions">
+            <a class="button" href="#catalogo">
+              Ver productos
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="19" height="19">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </a>
+            <a
+              class="button button--secondary"
+              href={`https://wa.me/${site.whatsappNumber}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Escribir por WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <div class="hero__mark" aria-hidden="true">
+          <img src="/assets/logo-muscle-mania.webp" width="720" height="671" alt="" />
+          <span>THE THREE KINGS</span>
+        </div>
+      </div>
+      <div class="checker-stripe" aria-hidden="true"></div>
+    </section>
+
+    <section class="section section--featured" id="destacados" aria-labelledby="featured-heading">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Selección MMPR</p>
+            <h2 id="featured-heading">RECOMENDADOS</h2>
+          </div>
+          <p>Una selección rápida para empezar el wash, proteger la pintura y terminar con brillo.</p>
+        </div>
+
+        <div class="featured-rail">
+          {featuredProducts.map((product) => <ProductCard product={product} featured />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="order-strip" id="como-ordenar" aria-labelledby="order-heading">
+      <div class="container order-strip__inner">
+        <div>
+          <p class="eyebrow">Sin checkout. Sin vueltas.</p>
+          <h2 id="order-heading">ESCOGE. ENVÍA. CONFIRMA.</h2>
+        </div>
+        <ol>
+          <li><strong>01</strong><span>Añade productos a tu lista.</span></li>
+          <li><strong>02</strong><span>Ajusta las cantidades.</span></li>
+          <li><strong>03</strong><span>Confirma disponibilidad por WhatsApp.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section catalog" id="catalogo" aria-labelledby="catalog-heading">
+      <div class="container">
+        <div class="section-heading section-heading--catalog">
+          <div>
+            <p class="eyebrow">{products.length} presentaciones</p>
+            <h2 id="catalog-heading">TODOS LOS PRODUCTOS</h2>
+          </div>
+          <p>Busca por producto, marca, uso o presentación.</p>
+        </div>
+
+        <div class="catalog-toolbar" aria-label="Buscar y filtrar productos">
+          <label class="search-field">
+            <span class="visually-hidden">Buscar productos</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-4-4"></path>
+            </svg>
+            <input
+              type="search"
+              inputmode="search"
+              placeholder="Buscar shampoo, Fireball, gomas..."
+              autocomplete="off"
+              data-product-search-input
+            />
+            <button type="button" aria-label="Limpiar búsqueda" data-clear-search hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                <path d="m6 6 12 12M18 6 6 18"></path>
+              </svg>
+            </button>
+          </label>
+
+          <div class="category-filters" role="group" aria-label="Filtrar por categoría">
+            <button class="category-chip is-active" type="button" data-category="all" aria-pressed="true">Todos</button>
+            {categories.map((category) => (
+              <button class="category-chip" type="button" data-category={category} aria-pressed="false">
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="catalog-status" aria-live="polite">
+          <span data-result-count>{products.length} productos</span>
+          <button type="button" data-reset-filters hidden>Limpiar filtros</button>
+        </div>
+
+        <div class="product-grid" data-product-grid>
+          {products.map((product) => <ProductCard product={product} />)}
+        </div>
+
+        <div class="empty-state" data-empty-state hidden>
+          <p class="eyebrow">Sin resultados</p>
+          <h3>NO ENCONTRAMOS ESE PRODUCTO.</h3>
+          <p>Prueba con otra marca, aplicación o categoría.</p>
+          <button class="button button--secondary" type="button" data-reset-filters>Ver todos</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="checker-stripe" aria-hidden="true"></div>
+    <div class="container site-footer__inner">
+      <img src="/assets/logo-muscle-mania.webp" width="720" height="671" alt="Muscle Mania PR" />
+      <div>
+        <strong>Muscle Mania PR</strong>
+        <span>Catálogo de productos de detailing</span>
+      </div>
+      <a href={`https://wa.me/${site.whatsappNumber}`} target="_blank" rel="noreferrer">WhatsApp</a>
+    </div>
+  </footer>
+
+  <div class="mobile-selection" data-mobile-selection hidden>
+    <button type="button" data-open-selection>
+      <span><strong data-selection-count>0</strong> <span data-selection-label>productos seleccionados</span></span>
+      <span>Revisar lista</span>
+    </button>
+  </div>
+
+  <dialog class="selection-dialog" data-selection-dialog aria-labelledby="selection-title">
+    <div class="selection-dialog__header">
+      <div>
+        <p class="eyebrow">Solicitud por WhatsApp</p>
+        <h2 id="selection-title">TU LISTA</h2>
+      </div>
+      <button class="icon-button" type="button" data-close-selection aria-label="Cerrar lista">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24">
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="selection-dialog__body">
+      <div class="selection-empty" data-selection-empty>
+        <p>Tu lista está vacía.</p>
+        <span>Añade productos del catálogo para preparar el mensaje.</span>
+      </div>
+      <div class="selection-lines" data-selection-lines></div>
+    </div>
+
+    <div class="selection-dialog__footer">
+      <p>Confirmaremos disponibilidad y próximos pasos directamente contigo.</p>
+      <a class="button button--whatsapp" href={`https://wa.me/${site.whatsappNumber}`} target="_blank" rel="noreferrer" data-whatsapp-link aria-disabled="true">
+        Enviar lista por WhatsApp
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5Z"></path>
+          <path d="M8.5 8.5c.5 3 2 4.5 5 5l1-1"></path>
+        </svg>
+      </a>
+      <button class="text-button" type="button" data-clear-selection disabled>Vaciar lista</button>
+    </div>
+  </dialog>
+
+  <div class="visually-hidden" aria-live="polite" data-live-region></div>
+
+  <script define:vars={{ whatsappNumber: site.whatsappNumber }}>
+    const storageKey = 'mmpr-selection-v1';
+    const selection = new Map();
+    const normalize = (value = '') => value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+    const allProductCards = Array.from(document.querySelectorAll('[data-product-id]'));
+    const catalogCards = Array.from(document.querySelectorAll('[data-catalog-card]'));
+    const searchInput = document.querySelector('[data-product-search-input]');
+    const clearSearchButton = document.querySelector('[data-clear-search]');
+    const categoryButtons = Array.from(document.querySelectorAll('[data-category]'));
+    const resultCount = document.querySelector('[data-result-count]');
+    const resetButtons = Array.from(document.querySelectorAll('[data-reset-filters]'));
+    const emptyState = document.querySelector('[data-empty-state]');
+    const selectionDialog = document.querySelector('[data-selection-dialog]');
+    const selectionLines = document.querySelector('[data-selection-lines]');
+    const selectionEmpty = document.querySelector('[data-selection-empty]');
+    const whatsappLink = document.querySelector('[data-whatsapp-link]');
+    const clearSelectionButton = document.querySelector('[data-clear-selection]');
+    const mobileSelection = document.querySelector('[data-mobile-selection]');
+    const liveRegion = document.querySelector('[data-live-region]');
+    let activeCategory = 'all';
+
+    const loadSelection = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        if (!Array.isArray(saved)) return;
+        saved.forEach((item) => {
+          if (item?.id && Number.isInteger(item.qty) && item.qty > 0) selection.set(item.id, item);
+        });
+      } catch {
+        localStorage.removeItem(storageKey);
+      }
+    };
+
+    const saveSelection = () => {
+      localStorage.setItem(storageKey, JSON.stringify(Array.from(selection.values())));
+    };
+
+    const announce = (message) => {
+      if (liveRegion) liveRegion.textContent = message;
+    };
+
+    const detailsFromCard = (card) => ({
+      id: card.dataset.productId,
+      brand: card.dataset.productBrand,
+      name: card.dataset.productName,
+      size: card.dataset.productSize,
+      qty: 1,
+    });
+
+    const totalQuantity = () => Array.from(selection.values()).reduce((total, item) => total + item.qty, 0);
+
+    const updateCardControls = () => {
+      allProductCards.forEach((card) => {
+        const item = selection.get(card.dataset.productId);
+        const qty = item?.qty || 0;
+        const addButton = card.querySelector('[data-add-product]');
+        const quantityControl = card.querySelector('[data-quantity-control]');
+        const output = card.querySelector('[data-quantity]');
+        if (addButton) addButton.hidden = qty > 0;
+        if (quantityControl) quantityControl.hidden = qty === 0;
+        if (output) output.textContent = String(qty);
+        card.classList.toggle('is-selected', qty > 0);
+      });
+    };
+
+    const buildMessage = () => {
+      const lines = Array.from(selection.values()).map((item) => {
+        const size = item.size ? ` — ${item.size}` : '';
+        return `• ${item.qty} × ${item.brand} ${item.name}${size}`;
+      });
+      return [
+        'Hola, me interesa verificar disponibilidad de estos productos de Muscle Mania PR:',
+        '',
+        ...lines,
+        '',
+        '¿Me puedes confirmar disponibilidad? Gracias.',
+      ].join('\n');
+    };
+
+    const renderSelection = () => {
+      const count = totalQuantity();
+      document.querySelectorAll('[data-selection-count]').forEach((node) => {
+        node.textContent = String(count);
+      });
+      document.querySelectorAll('[data-selection-label]').forEach((node) => {
+        node.textContent = count === 1 ? 'producto seleccionado' : 'productos seleccionados';
+      });
+
+      if (mobileSelection) mobileSelection.hidden = count === 0;
+      if (selectionEmpty) selectionEmpty.hidden = count > 0;
+      if (clearSelectionButton) clearSelectionButton.disabled = count === 0;
+
+      if (selectionLines) {
+        selectionLines.innerHTML = '';
+        selection.forEach((item) => {
+          const row = document.createElement('article');
+          row.className = 'selection-line';
+          row.dataset.selectionId = item.id;
+
+          const text = document.createElement('div');
+          const brand = document.createElement('span');
+          brand.textContent = item.brand;
+          const name = document.createElement('strong');
+          name.textContent = item.name;
+          const size = document.createElement('small');
+          size.textContent = item.size || 'Presentación por confirmar';
+          text.append(brand, name, size);
+
+          const controls = document.createElement('div');
+          controls.className = 'quantity-control quantity-control--dialog';
+          controls.innerHTML = `
+            <button type="button" data-dialog-decrease aria-label="Reducir cantidad de ${item.name}">−</button>
+            <output>${item.qty}</output>
+            <button type="button" data-dialog-increase aria-label="Aumentar cantidad de ${item.name}">+</button>
+          `;
+          row.append(text, controls);
+          selectionLines.append(row);
+        });
+      }
+
+      if (whatsappLink) {
+        whatsappLink.setAttribute('aria-disabled', count === 0 ? 'true' : 'false');
+        whatsappLink.href = count
+          ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(buildMessage())}`
+          : `https://wa.me/${whatsappNumber}`;
+      }
+
+      updateCardControls();
+      saveSelection();
+    };
+
+    const setQuantity = (id, quantity, card) => {
+      const nextQuantity = Math.max(0, Math.min(99, quantity));
+      if (nextQuantity === 0) {
+        const removed = selection.get(id);
+        selection.delete(id);
+        if (removed) announce(`${removed.name} fue removido de tu lista.`);
+      } else {
+        const current = selection.get(id) || detailsFromCard(card);
+        selection.set(id, { ...current, qty: nextQuantity });
+        announce(`${current.name}: cantidad ${nextQuantity}.`);
+      }
+      renderSelection();
+    };
+
+    allProductCards.forEach((card) => {
+      const id = card.dataset.productId;
+      card.querySelector('[data-add-product]')?.addEventListener('click', () => setQuantity(id, 1, card));
+      card.querySelector('[data-increase]')?.addEventListener('click', () => {
+        setQuantity(id, (selection.get(id)?.qty || 0) + 1, card);
+      });
+      card.querySelector('[data-decrease]')?.addEventListener('click', () => {
+        setQuantity(id, (selection.get(id)?.qty || 0) - 1, card);
+      });
+    });
+
+    const applyFilters = () => {
+      const query = normalize(searchInput?.value || '');
+      let visibleCount = 0;
+      catalogCards.forEach((card) => {
+        const matchesQuery = !query || normalize(card.dataset.productSearch).includes(query);
+        const matchesCategory = activeCategory === 'all' || card.dataset.productCategory === activeCategory;
+        const visible = matchesQuery && matchesCategory;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+
+      if (resultCount) resultCount.textContent = `${visibleCount} ${visibleCount === 1 ? 'producto' : 'productos'}`;
+      if (emptyState) emptyState.hidden = visibleCount !== 0;
+      if (clearSearchButton) clearSearchButton.hidden = !query;
+      resetButtons.forEach((button) => {
+        if (!button.closest('[data-empty-state]')) button.hidden = !query && activeCategory === 'all';
+      });
+    };
+
+    searchInput?.addEventListener('input', applyFilters);
+    clearSearchButton?.addEventListener('click', () => {
+      searchInput.value = '';
+      searchInput.focus();
+      applyFilters();
+    });
+
+    categoryButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        activeCategory = button.dataset.category;
+        categoryButtons.forEach((chip) => {
+          const active = chip === button;
+          chip.classList.toggle('is-active', active);
+          chip.setAttribute('aria-pressed', String(active));
+        });
+        applyFilters();
+      });
+    });
+
+    resetButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        activeCategory = 'all';
+        if (searchInput) searchInput.value = '';
+        categoryButtons.forEach((chip) => {
+          const active = chip.dataset.category === 'all';
+          chip.classList.toggle('is-active', active);
+          chip.setAttribute('aria-pressed', String(active));
+        });
+        applyFilters();
+        searchInput?.focus();
+      });
+    });
+
+    document.querySelectorAll('[data-open-selection]').forEach((button) => {
+      button.addEventListener('click', () => selectionDialog?.showModal());
+    });
+    document.querySelector('[data-close-selection]')?.addEventListener('click', () => selectionDialog?.close());
+    selectionDialog?.addEventListener('click', (event) => {
+      if (event.target === selectionDialog) selectionDialog.close();
+    });
+
+    selectionLines?.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      const row = event.target.closest('[data-selection-id]');
+      if (!button || !row) return;
+      const item = selection.get(row.dataset.selectionId);
+      const card = allProductCards.find((candidate) => candidate.dataset.productId === row.dataset.selectionId);
+      if (!item || !card) return;
+      if (button.matches('[data-dialog-increase]')) setQuantity(item.id, item.qty + 1, card);
+      if (button.matches('[data-dialog-decrease]')) setQuantity(item.id, item.qty - 1, card);
+    });
+
+    clearSelectionButton?.addEventListener('click', () => {
+      selection.clear();
+      announce('Tu lista fue vaciada.');
+      renderSelection();
+    });
+
+    whatsappLink?.addEventListener('click', (event) => {
+      if (whatsappLink.getAttribute('aria-disabled') === 'true') event.preventDefault();
+    });
+
+    loadSelection();
+    renderSelection();
+    applyFilters();
+  </script>
+</BaseLayout>
